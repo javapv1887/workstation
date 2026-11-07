@@ -1,0 +1,20 @@
+# Docker 운영 실습 추가 점검
+# Codex가 실습 기록의 종료 코드 137을 확인하기 위해 실행한 읽기 전용 점검.
+# 사용자 실습 원본은 docker-operations.txt에 보존. 이 파일은 원본 실습과 별도의 추가 검증 기록.
+
+$ "$HOME/.docker/bin/docker" inspect ws-ubuntu --format '{{json .State}}'
+{"Status":"exited","Running":false,"Paused":false,"Restarting":false,"OOMKilled":false,"Dead":false,"Pid":0,"ExitCode":137,"Error":"","StartedAt":"2026-11-04T11:29:19.645890291Z","FinishedAt":"2026-11-04T11:30:59.144939088Z"}
+
+$ "$HOME/.docker/bin/docker" inspect ws-ubuntu --format '{{.Id}} {{.Path}} {{json .Args}}'
+8a1ebbb088f7b7918cbae7b0ae179a8a0d9fcc6f86255181dd501eddbaa80cca bash []
+
+$ "$HOME/.docker/bin/docker" events --since '2026-11-04T20:28:41+09:00' --until '2026-11-04T20:31:20+09:00' --filter container=ws-ubuntu --format '{{json .}}'
+# 위 이벤트 출력에서 Action, time, signal, exitCode를 발췌하고, time을 KST로 변환한 표.
+# 대상 컨테이너: 8a1ebbb088f7b7918cbae7b0ae179a8a0d9fcc6f86255181dd501eddbaa80cca
+time | KST | Action | signal | exitCode
+1793791759 | 2026-11-04 20:29:19 | start | - | -
+1793791856 | 2026-11-04 20:30:56 | kill | 15 | -
+1793791859 | 2026-11-04 20:30:59 | kill | 9 | -
+1793791859 | 2026-11-04 20:30:59 | stop | - | -
+1793791859 | 2026-11-04 20:30:59 | die | - | 137
+

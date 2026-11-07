@@ -1,0 +1,96 @@
+# Ubuntu 컨테이너 실습: 공유용 발췌 로그
+# 원본: ubuntu-practice.txt (원본 파일은 수정하지 않음)
+# 기록 시작: Tue Nov  3 22:37:15 2026
+# 기록 종료: Tue Nov  3 22:43:54 2026
+# 실제 명령과 출력을 발췌. 터미널 제어 문자·중복 재표시·실행 전 취소한 입력을 제외하고, 반복 확인 및 docker logs 출력 일부를 생략.
+# 프롬프트는 Mac=$, Ubuntu=#로 단순화. 중간의 단독 - 입력 오류도 보존.
+
+$ docker run -it --name ws-ubuntu ubuntu:24.04 bash
+Unable to find image 'ubuntu:24.04' locally
+24.04: Pulling from library/ubuntu
+e2d2bb84d022: Pulling fs layer
+e2d2bb84d022: Downloading  2.097MB/28.94MB
+e2d2bb84d022: Downloading  6.291MB/28.94MB
+e2d2bb84d022: Downloading   7.34MB/28.94MB
+e2d2bb84d022: Downloading  13.63MB/28.94MB
+e2d2bb84d022: Downloading  17.83MB/28.94MB
+e2d2bb84d022: Downloading  22.02MB/28.94MB
+e2d2bb84d022: Downloading  23.07MB/28.94MB
+e2d2bb84d022: Downloading  28.31MB/28.94MB
+e2d2bb84d022: Download complete
+2238dc1b4376: Downloading  1.939MB/1.939MB
+e2d2bb84d022: Extracting 1 s
+2238dc1b4376: Download complete
+e2d2bb84d022: Pull complete
+Digest: sha256:fe81560990fae86dc4743202b2cb4d3df98d0bcf949173cecef15ce1127ef852
+Status: Downloaded newer image for ubuntu:24.04
+
+# cat /etc/os-release
+PRETTY_NAME="Ubuntu 24.04.5 LTS"
+NAME="Ubuntu"
+VERSION_ID="24.04"
+VERSION="24.04.5 LTS (Noble Numbat)"
+VERSION_CODENAME=noble
+ID=ubuntu
+ID_LIKE=debian
+HOME_URL="https://www.ubuntu.com/"
+SUPPORT_URL="https://help.ubuntu.com/"
+BUG_REPORT_URL="https://bugs.launchpad.net/ubuntu/"
+PRIVACY_POLICY_URL="https://www.ubuntu.com/legal/terms-and-policies/privacy-policy"
+UBUNTU_CODENAME=noble
+LOGO=ubuntu-logo
+
+# pwd
+/
+
+# ls
+bin   dev  home  media  opt   root  sbin  sys  usr
+boot  etc  lib   mnt    proc  run   srv   tmp  var
+
+# echo "Hello Ubuntu"
+Hello Ubuntu
+
+# 추가 확인 중 단독 - 입력 오류
+# echo "Hello Ubuntu"
+Hello Ubuntu
+# -
+bash: -: command not found
+# cat /etc/os-release
+PRETTY_NAME="Ubuntu 24.04.5 LTS"
+NAME="Ubuntu"
+VERSION_ID="24.04"
+VERSION="24.04.5 LTS (Noble Numbat)"
+VERSION_CODENAME=noble
+ID=ubuntu
+ID_LIKE=debian
+HOME_URL="https://www.ubuntu.com/"
+SUPPORT_URL="https://help.ubuntu.com/"
+BUG_REPORT_URL="https://bugs.launchpad.net/ubuntu/"
+PRIVACY_POLICY_URL="https://www.ubuntu.com/legal/terms-and-policies/privacy-policy"
+UBUNTU_CODENAME=noble
+LOGO=ubuntu-logo
+# exit
+exit
+
+$ docker ps -a
+CONTAINER ID   IMAGE          COMMAND    CREATED             STATUS                         PORTS     NAMES
+8a1ebbb088f7   ubuntu:24.04   "bash"     5 minutes ago       Exited (0) 11 seconds ago                ws-ubuntu
+904b6d20bfc7   hello-world    "/hello"   About an hour ago   Exited (0) About an hour ago             jolly_cray
+14a81c87714f   hello-world    "/hello"   About an hour ago   Exited (0) About an hour ago             compassionate_merkle
+
+$ docker images
+IMAGE                ID             DISK USAGE   CONTENT SIZE   EXTRA
+hello-world:latest   c567b231f656       22.6kB         10.3kB    U
+ubuntu:24.04         fe81560990fa        141MB         30.9MB    U
+
+$ docker logs ws-ubuntu
+[컨테이너 기록의 출력 발췌: 위 명령의 재실행이 아니라 저장된 로그가 다시 출력된 것임]
+PRETTY_NAME="Ubuntu 24.04.5 LTS"
+[중간 생략]
+Hello Ubuntu
+[중간 생략]
+bash: -: command not found
+[중간 생략]
+exit
+
+$ exit

@@ -1,0 +1,44 @@
+# attach / exec 실습: 공유용 발췌 로그
+# 원본: attach-exec.txt (원본 파일은 수정하지 않음)
+# 기록 시작: Wed Nov  4 20:39:54 2026
+# 기록 종료: Wed Nov  4 20:43:01 2026
+# Mac 프롬프트는 $, Ubuntu 프롬프트는 #으로 단순화. 입력 수정·화면 줄바꿈·커서 제어 문자와 Docker Debug 안내문은 제외.
+# 컨테이너 목록은 ws-ubuntu 행을 발췌. attach 종료 후 docker ps는 실제로 헤더만 출력돼 그대로 보존.
+
+$ docker start ws-ubuntu
+ws-ubuntu
+
+$ ps
+  PID TTY           TIME CMD
+18766 ttys000    0:00.45 -zsh
+45309 ttys000    0:00.01 script -a evidence/logs/attach-exec.txt
+45310 ttys001    0:00.04 /bin/zsh -i
+
+$ docker ps
+CONTAINER ID   IMAGE          COMMAND   CREATED        STATUS          PORTS     NAMES
+8a1ebbb088f7   ubuntu:24.04   "bash"    22 hours ago   Up 10 seconds             ws-ubuntu
+
+$ docker exec -it ws-ubuntu bash
+# echo "exec test"
+exec test
+# exit
+exit
+
+$ docker ps
+CONTAINER ID   IMAGE          COMMAND   CREATED        STATUS              PORTS     NAMES
+8a1ebbb088f7   ubuntu:24.04   "bash"    22 hours ago   Up About a minute             ws-ubuntu
+
+$ docker attach ws-ubuntu
+# echo "attach test"
+attach test
+# exit
+exit
+
+$ docker ps
+CONTAINER ID   IMAGE     COMMAND   CREATED   STATUS    PORTS     NAMES
+
+$ docker ps -a
+CONTAINER ID   IMAGE          COMMAND    CREATED          STATUS                      PORTS     NAMES
+8a1ebbb088f7   ubuntu:24.04   "bash"     22 hours ago     Exited (0) 18 seconds ago             ws-ubuntu
+
+$ exit

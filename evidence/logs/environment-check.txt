@@ -1,0 +1,20 @@
+# 2026-11-03: Codex가 문서 정리 중 읽기 전용 명령으로 확인한 결과
+
+$ sw_vers -productVersion
+26.3.1
+$ uname -m
+arm64
+$ zsh --version
+zsh 5.9 (arm64-apple-darwin25.0)
+$ git --version
+git version 2.50.1 (Apple Git-155)
+$ /Applications/Docker.app/Contents/Resources/bin/docker --version
+Docker version 29.9.2, build a82e528
+$ /Applications/Docker.app/Contents/Resources/cli-plugins/docker-compose version
+Docker Compose version v5.6.1
+$ git config --get user.name
+javapv1887
+$ git config --get user.email
+351423688+javapv1887@users.noreply.github.com
+$ git config --get init.defaultBranch
+main

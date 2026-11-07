@@ -1,0 +1,35 @@
+# Docker 볼륨 실습 정리 로그
+# 원본 파일은 volume-practice.txt에 보존했다.
+# 실습과 관련된 명령과 출력을 발췌했다. 프롬프트는 $로 통일했다.
+
+$ docker volume create ws-volume-data
+ws-volume-data
+
+$ docker run --name ws-volume-writer \
+  --mount type=volume,source=ws-volume-data,target=/data \
+  ubuntu:24.04 sh -c 'echo "volume data survives" > /data/note.txt && cat /data/note.txt'
+volume data survives
+
+$ docker ps -a --filter name=ws-volume-writer
+CONTAINER ID   IMAGE          COMMAND                   CREATED          STATUS                      PORTS     NAMES
+c92f7a168c1c   ubuntu:24.04   "sh -c 'echo \"volume…"   12 seconds ago   Exited (0) 10 seconds ago             ws-volume-writer
+
+$ docker rm ws-volume-writer
+ws-volume-writer
+
+$ docker ps -a --filter name=ws-volume-writer
+CONTAINER ID   IMAGE     COMMAND   CREATED   STATUS    PORTS     NAMES
+
+$ docker volume ls --filter name=ws-volume-data
+DRIVER    VOLUME NAME
+local     ws-volume-data
+
+$ docker run --name ws-volume-reader \
+  --mount type=volume,source=ws-volume-data,target=/data,readonly \
+  ubuntu:24.04 cat /data/note.txt
+volume data survives
+
+$ exit
+Saving session...
+...saving history...truncating history files...
+...completed.

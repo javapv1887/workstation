@@ -1,0 +1,6 @@
+.DS_Store
+evidence/logs/*.txt
+!evidence/logs/*-clean.txt
+!evidence/logs/terminal-practice.txt
+!evidence/logs/environment-check.txt
+!evidence/logs/docker-operations-check.txt

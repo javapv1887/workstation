@@ -1,0 +1,26 @@
+# 권한 변경 실습: 제출용 발췌
+# 원본: permissions.txt (원본 파일은 수정하지 않음)
+# 기록 시작: Tue Nov  3 20:54:39 2026
+# 기록 종료: Tue Nov  3 21:10:59 2026
+# 실제 권한 관련 명령과 ls 출력만 발췌. 터미널 제어 문자, 중복 재표시, 실행 전 취소한 입력은 제외.
+# 프롬프트는 $로 통일하고 사용자명은 <USER>로 가림.
+
+$ cd practice/terminal
+$ mkdir -p permission-test
+$ ls -ld note.txt permission-test
+-rw-r--r--@ 1 <USER>  staff  16 Nov  3 20:02 note.txt
+drwxr-xr-x  2 <USER>  staff  64 Nov  3 20:56 permission-test
+
+$ chmod 600 note.txt
+$ chmod 700 permission-test
+$ ls -ld note.txt permission-test
+-rw-------@ 1 <USER>  staff  16 Nov  3 20:02 note.txt
+drwx------  2 <USER>  staff  64 Nov  3 20:56 permission-test
+
+$ chmod 644 note.txt
+$ chmod 755 permission-test
+$ ls -ld note.txt permission-test
+-rw-r--r--@ 1 <USER>  staff  16 Nov  3 20:02 note.txt
+drwxr-xr-x  2 <USER>  staff  64 Nov  3 20:56 permission-test
+
+$ exit

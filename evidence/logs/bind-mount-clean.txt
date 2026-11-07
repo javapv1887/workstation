@@ -1,0 +1,119 @@
+# 바인드 마운트 실습: 공유용 정리 로그 (2026-11-05)
+# 원본: bind-mount.txt. 터미널 제어 문자, 중복 재표시와 반복 시도는 제외했다.
+# 사용자 프롬프트를 $로 통일했고, 호스트의 과제 폴더는 <PROJECT_ROOT>로 표시했다.
+# 컨테이너 목록은 관련 행만 발췌했다.
+
+$ docker run -d \
+  --name ws-web-bind \
+  -p 127.0.0.1:8081:80 \
+  --mount type=bind,source="$(pwd)/site",target=/usr/share/nginx/html,readonly \
+  ws-web:1.0
+cc3ce9d69804ef02c36116c9d30d5078e22224ce8eebadacd3e2892d9f096b37
+
+$ docker ps
+CONTAINER ID   IMAGE        COMMAND                  CREATED          STATUS          PORTS                    NAMES
+cc3ce9d69804   ws-web:1.0   "/docker-entrypoint.…"   13 seconds ago   Up 12 seconds   127.0.0.1:8081->80/tcp   ws-web-bind
+
+$ docker inspect ws-web-bind --format '{{json .Mounts}}'
+[{"Type":"bind","Source":"<PROJECT_ROOT>/site","Destination":"/usr/share/nginx/html","Mode":"","RW":false,"Propagation":"rprivate"}]
+
+$ cat site/index.html
+<!doctype html>
+<html lang="ko">
+<head><meta charset="UTF-8"><title>나의 Docker 작업실</title></head>
+<body>
+<h1>나의 첫 Docker 웹 서버</h1>
+<p>javapv1887의 컨테이너 실습입니다.</p>
+</body>
+</html>
+
+$ curl -i http://127.0.0.1:8081
+HTTP/1.1 200 OK
+Server: nginx/1.31.8
+Date: Thu, 05 Nov 2026 10:30:33 GMT
+Content-Type: text/html
+Content-Length: 219
+Last-Modified: Wed, 04 Nov 2026 11:59:09 GMT
+Connection: keep-alive
+ETag: "6aeb1e0d-db"
+Accept-Ranges: bytes
+
+<!doctype html>
+<html lang="ko">
+<head><meta charset="UTF-8"><title>나의 Docker 작업실</title></head>
+<body>
+<h1>나의 첫 Docker 웹 서버</h1>
+<p>javapv1887의 컨테이너 실습입니다.</p>
+</body>
+</html>
+
+$ sed -i '' 's/나의 첫 Docker 웹 서버/바인드 마운트로 수정한 웹 서버/' site/index.html
+$ cat site/index.html
+<!doctype html>
+<html lang="ko">
+<head><meta charset="UTF-8"><title>나의 Docker 작업실</title></head>
+<body>
+<h1>바인드 마운트로 수정한 웹 서버</h1>
+<p>javapv1887의 컨테이너 실습입니다.</p>
+</body>
+</html>
+
+$ curl -i http://127.0.0.1:8081
+HTTP/1.1 200 OK
+Server: nginx/1.31.8
+Date: Thu, 05 Nov 2026 10:31:04 GMT
+Content-Type: text/html
+Content-Length: 234
+Last-Modified: Thu, 05 Nov 2026 10:30:56 GMT
+Connection: keep-alive
+ETag: "6aec5ae0-ea"
+Accept-Ranges: bytes
+
+<!doctype html>
+<html lang="ko">
+<head><meta charset="UTF-8"><title>나의 Docker 작업실</title></head>
+<body>
+<h1>바인드 마운트로 수정한 웹 서버</h1>
+<p>javapv1887의 컨테이너 실습입니다.</p>
+</body>
+</html>
+
+$ curl -i http://127.0.0.1:8080
+curl: (7) Failed to connect to 127.0.0.1 port 8080 after 0 ms: Couldn't connect to server
+
+$ docker ps -a
+CONTAINER ID   IMAGE          COMMAND                  CREATED              STATUS                      PORTS                    NAMES
+cc3ce9d69804   ws-web:1.0     "/docker-entrypoint.…"   About a minute ago   Up About a minute           127.0.0.1:8081->80/tcp   ws-web-bind
+66d0ba67e182   ws-web:1.0     "/docker-entrypoint.…"   22 hours ago         Exited (0) 22 hours ago                              ws-web-8080
+
+$ docker start ws-web:1.0
+Error response from daemon: No such container: ws-web:1.0
+failed to start containers: ws-web:1.0
+
+$ docker start ws-web-8080
+ws-web-8080
+
+$ curl -i http://127.0.0.1:8080
+HTTP/1.1 200 OK
+Server: nginx/1.31.8
+Date: Thu, 05 Nov 2026 10:33:12 GMT
+Content-Type: text/html
+Content-Length: 219
+Last-Modified: Wed, 04 Nov 2026 11:59:09 GMT
+Connection: keep-alive
+ETag: "6aeb1e0d-db"
+Accept-Ranges: bytes
+
+<!doctype html>
+<html lang="ko">
+<head><meta charset="UTF-8"><title>나의 Docker 작업실</title></head>
+<body>
+<h1>나의 첫 Docker 웹 서버</h1>
+<p>javapv1887의 컨테이너 실습입니다.</p>
+</body>
+</html>
+
+$ exit
+Saving session...
+...saving history...truncating history files...
+...completed.

@@ -1,0 +1,56 @@
+$ cd "$HOME/codyssey"
+cd: no such file or directory: <HOME>/codyssey
+$ mkdir -p "<PROJECT_ROOT>"
+$ cd "<PROJECT_ROOT>"
+$ mkdir -p practice/terminal_evidence/logs_evidence/images_site
+$ pwd
+<PROJECT_ROOT>
+$ touch README.md
+$ ls-la
+zsh: command not found: ls-la
+$ ls -la
+total 0
+drwxr-xr-x  4 <USER>  staff  128 Nov  3 19:41 .
+drwxr-xr-x@ 7 <USER>  staff  224 Nov  3 19:38 ..
+-rw-r--r--  1 <USER>  staff    0 Nov  3 19:41 README.md
+drwxr-xr-x  3 <USER>  staff   96 Nov  3 19:40 practice
+$ mkdir -p practice/terminal evidence/logs evidence/images site
+
+$ cd practice/terminal
+
+$ touch empty.txt
+$ echo "hi"
+hi
+$ echo "터미널연습" > note.tct
+$ echo "터미널연습" > note.txt
+$ cat note.txt
+터미널연습
+$ ls -a
+.		..		.DS_Store	empty.txt	note.txt
+$ ls -la
+total 24
+drwxr-xr-x  5 <USER>  staff   160 Nov  3 20:02 .
+drwxr-xr-x  4 <USER>  staff   128 Nov  3 20:02 ..
+-rw-r--r--@ 1 <USER>  staff  6148 Nov  3 20:02 .DS_Store
+-rw-r--r--  1 <USER>  staff     0 Nov  3 20:01 empty.txt
+-rw-r--r--@ 1 <USER>  staff    16 Nov  3 20:02 note.txt
+$ pwd
+<PROJECT_ROOT>/practice/terminal
+$ cp note.txt note-copy.txt
+$ ls
+empty.txt	note-copy.txt	note.txt
+$ cat note-copy.txt
+터미널연습
+$ cat note-copy.txt note.txt
+터미널연습
+터미널연습
+$ cat note-copy.txt
+터미널연습
+$ cat note.txt
+터미널연습
+$ mv note-copy.txt renamed.txt
+$ ls
+empty.txt	note.txt	renamed.txt
+$ rm renamed.txt
+$ ls
+empty.txt	note.txt

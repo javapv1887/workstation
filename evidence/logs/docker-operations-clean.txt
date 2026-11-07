@@ -1,0 +1,37 @@
+# Docker 운영 실습: 공유용 발췌 로그
+# 원본: docker-operations.txt (원본 파일은 수정하지 않음)
+# 기록 시작: Wed Nov  4 20:28:41 2026
+# 기록 종료: Wed Nov  4 20:31:20 2026
+# 프롬프트를 $로 통일. 터미널 제어 문자·입력 수정·화면 줄바꿈을 정리하고 컨테이너 목록은 ws-ubuntu 행만 발췌.
+# 화면 줄바꿈으로 나뉜 stats 대상 이름은 실제 출력의 NAME=ws-ubuntu와 대조해 한 줄로 정리.
+# Mac의 ps 출력도 보존. 중지 후 docker ps 재조회 출력은 기록돼 있지 않아 추가하지 않음.
+
+$ docker ps -a
+CONTAINER ID   IMAGE          COMMAND    CREATED         STATUS                     PORTS     NAMES
+8a1ebbb088f7   ubuntu:24.04   "bash"     22 hours ago    Exited (0) 8 minutes ago             ws-ubuntu
+
+$ docker start ws-ubuntu
+ws-ubuntu
+
+$ ps
+  PID TTY           TIME CMD
+18766 ttys000    0:00.43 -zsh
+44394 ttys000    0:00.01 script -a evidence/logs/docker-operations.txt
+44395 ttys001    0:00.04 /bin/zsh -i
+
+$ docker ps
+CONTAINER ID   IMAGE          COMMAND   CREATED        STATUS          PORTS     NAMES
+8a1ebbb088f7   ubuntu:24.04   "bash"    22 hours ago   Up 19 seconds             ws-ubuntu
+
+$ docker stats --no-stream ws-ubuntu
+CONTAINER ID   NAME        CPU %     MEM USAGE / LIMIT     MEM %     NET I/O         BLOCK I/O     PIDS
+8a1ebbb088f7   ws-ubuntu   0.00%     5.629MiB / 3.825GiB   0.14%     1.75kB / 126B   4.74MB / 0B   1
+
+$ docker stop ws-ubuntu
+ws-ubuntu
+
+$ docker ps -a
+CONTAINER ID   IMAGE          COMMAND    CREATED         STATUS                       PORTS     NAMES
+8a1ebbb088f7   ubuntu:24.04   "bash"     22 hours ago    Exited (137) 7 seconds ago             ws-ubuntu
+
+$ exit

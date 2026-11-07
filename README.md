@@ -52,13 +52,14 @@
 - [x] 바인드 마운트 변경 전후 비교
 - [x] 컨테이너 삭제 전후 Docker 볼륨 데이터 유지 검증
 - [x] 과제 폴더의 Git 저장소 초기화와 커밋
-- [ ] GitHub 저장소 연결·업로드 및 VS Code 연동 증거 첨부
-- [ ] README의 전체 재현 절차·증거 링크 점검 후 저장소 URL 제출
+- [x] GitHub 저장소 연결·업로드 및 VS Code 연동 증거 첨부
+- [x] README 재현 절차·증거 링크 점검 및 제출 URL 준비
 
 ## 4. 터미널 기본 실습
 
 ### 기록을 읽는 방법
 
+- 개인 경로가 포함된 터미널 원본은 실습한 Mac에 보관했다. 제출 저장소에는 README에서 연결한 공유용 로그와 캡처를 포함했다.
 - 아래 코드블록은 직접 수행한 터미널 기록의 발췌다. 전체 기록은 [터미널 실습 로그](evidence/logs/terminal-practice.txt)에서 확인할 수 있다.
 - 프롬프트는 `$`로 통일하고, 사용자명은 `<USER>`, 홈 경로는 `<HOME>`, 과제 폴더의 절대경로는 `<PROJECT_ROOT>`로 가렸다. 이 표시는 명령어 그대로 복사할 값이 아니다.
 - 다른 컴퓨터에서 따라 할 때는 `<PROJECT_ROOT>`를 자신의 과제 폴더 절대경로로 바꾸고, `README.md`가 있는 폴더에서 시작한다.
@@ -821,6 +822,39 @@ git --no-pager log -1 --oneline
 git status
 ```
 
-### 14.2. GitHub 연동과 제출
+### 14.2. GitHub 원격 저장소 연결과 업로드
 
-GitHub 저장소 링크는 저장소를 연결하고 업로드한 뒤 추가한다. 제출 전에는 README에서 모든 소스·로그·이미지에 접근할 수 있고, 개인 경로를 바꿔도 절차를 재현할 수 있는지 확인한다.
+사용자 요청에 따라 Codex가 GitHub CLI로 공개 저장소를 만들고 첫 커밋 `c9d5756`을 올렸다. 로컬 `main`이 `origin/main`을 추적한다.
+
+```text
+$ gh repo create javapv1887/workstation --public --source=. --remote=origin --push
+https://github.com/javapv1887/workstation
+To https://github.com/javapv1887/workstation.git
+ * [new branch]      HEAD -> main
+branch 'main' set up to track 'origin/main'.
+$ git remote -v
+origin	https://github.com/javapv1887/workstation.git (fetch)
+origin	https://github.com/javapv1887/workstation.git (push)
+```
+
+### 14.3. VS Code의 GitHub 로그인과 저장소 연동 확인
+
+VS Code에서 `workstation` 폴더를 열고 계정 메뉴의 `javapv1887 (GitHub)` 로그인과 소스 제어 그래프의 `main`을 확인했다. 같은 화면에서 `.git/config`의 `origin` URL과 `main`의 추적 설정을 확인했다.
+
+![VS Code의 GitHub 로그인 계정과 workstation 원격 저장소 설정](evidence/images/vscode-github.jpg)
+
+### 14.4. 다른 환경에서 재현 및 제출
+
+Git이 설치돼 있고 Docker 엔진이 실행 중인 환경에서 저장소를 내려받는다.
+
+```bash
+git clone https://github.com/javapv1887/workstation.git
+cd workstation
+```
+
+- 터미널과 권한 실습은 별도의 실습 폴더에서 4~5절을 따라 한다. `<PROJECT_ROOT>`는 그 폴더의 절대경로로 바꾼다.
+- Docker 기초와 Ubuntu 실습은 6~9절 순서로 진행한다. `$`가 붙은 명령은 호스트에서, Ubuntu 내부 명령은 컨테이너 셸에서 실행한다. 프롬프트 기호는 빼고 입력한다.
+- 웹 서버와 바인드 마운트는 복제한 저장소에서 10~11절을 따라 한다. 10.1절의 원래 `<h1>`으로 되돌린 후 빌드하고, 11.2절에서 Mac의 파일을 수정해 응답을 비교한다. 11.2절의 `sed -i ''`는 macOS용이다. 다른 운영체제에서는 편집기로 `site/index.html`의 제목을 바꾸고 저장해도 된다.
+- 볼륨 실습은 12절에서 생성, 기록, 컨테이너 삭제, 새 컨테이너에서 읽기 순으로 확인한다. 이미 사용 중인 이름이나 포트가 있다면 해당 실습의 명령에서 다른 이름이나 포트로 일관되게 바꾼다.
+
+제출할 URL은 [javapv1887/workstation](https://github.com/javapv1887/workstation)이다.

@@ -140,6 +140,14 @@ empty.txt       note.txt
 | 복사 | `cp` 후 `ls`, `cat` | 원본·복사본이 함께 존재하고 내용 일치 | [4.3](#43-복사와-내용-비교) |
 | 이름 변경·삭제 | `mv`, `rm` 후 각각 `ls` | 변경된 이름을 확인한 뒤 목록에서 사라짐 | [4.4](#44-이름-변경과-삭제) |
 
+### 4.6. 절대 경로와 상대 경로를 고르는 기준
+
+절대 경로는 파일 시스템의 루트 `/`에서 시작한다. 예를 들어 저장소를 `/Users/student/workstation`에 복제했다면 `/Users/student/workstation/site/index.html`은 터미널의 현재 위치와 관계없이 같은 파일을 가리킨다. 다른 디렉터리에서 작업 중이거나 도구에 특정 파일 위치를 넘길 때 유용하다.
+
+상대 경로는 기준 디렉터리에서 시작한다. 저장소 루트에서 `cat ./site/index.html`을 실행하면 웹 파일을 읽을 수 있다. 저장소 내부 파일을 편집하거나 README에서 증거 파일을 링크할 때는 상대 경로를 권장한다. 복제한 위치가 달라도 폴더 구조와 기준 위치가 같으면 같은 명령과 링크를 사용할 수 있다. 터미널에서 기준 위치가 헷갈리면 `pwd`로 확인한다.
+
+바인드 마운트 실습은 저장소 루트에서 `"$(pwd)/site"`를 사용한다. `pwd`의 결과에 `/site`를 붙여 각 컴퓨터의 절대 경로를 만들므로 개인 경로를 명령에 고정할 필요가 없다. Dockerfile의 `COPY site/ /usr/share/nginx/html/`에서 `site/`의 기준은 빌드 컨텍스트이고, `/usr/share/nginx/html/`은 이미지 내부의 절대 경로다. [Dockerfile의 COPY 경로 규칙](https://docs.docker.com/reference/dockerfile/#copy)
+
 ## 5. 파일과 디렉터리의 권한 변경
 
 `practice/terminal/note.txt` 파일과 `practice/terminal/permission-test` 디렉터리의 권한을 변경하고 복원했다. 명령은 과제 폴더에서 시작한 기록 세션 안에서 실행했다.
@@ -527,6 +535,12 @@ COPY site/ /usr/share/nginx/html/
 
 ### 10.2. 이미지 빌드
 
+**이미지**는 프로그램과 실행에 필요한 파일, 기본 설정을 묶어 저장하는 읽기 전용 패키지다. **컨테이너**는 그 이미지에서 생성한 실행 인스턴스다. 같은 이미지로 여러 컨테이너를 만들 수 있고, 각 컨테이너는 별도의 상태를 가진다. [Docker 이미지 설명](https://docs.docker.com/get-started/docker-concepts/the-basics/what-is-an-image/), [컨테이너의 쓰기 계층](https://docs.docker.com/engine/storage/drivers/)
+
+1. **빌드**할 때 `docker build`가 Dockerfile을 읽고, 그 시점의 `site/`를 복사해 `ws-web:1.0` 이미지를 만든다.
+2. **실행**할 때 `docker run`이 그 이미지에서 컨테이너를 생성하고 NGINX를 시작한다.
+3. **실행 중 변경**은 기본적으로 해당 컨테이너의 쓰기 계층에 저장되며, 컨테이너를 삭제하면 이 계층도 사라진다. 마운트한 경로의 쓰기 작업은 연결한 호스트 폴더나 볼륨에 저장된다. 11절의 읽기 전용 바인드 마운트는 Mac에서 수정한 파일을 NGINX가 읽는 예이고, 12절은 볼륨에 저장한 파일을 새 컨테이너에서 다시 읽는 예다. 수정한 파일을 새 이미지에 포함하려면 다시 빌드하고, 그 이미지에서 새 컨테이너를 생성한다.
+
 ```text
 $ docker build -t ws-web:1.0 .
 [+] Building 8.9s (7/7) FINISHED                           docker:desktop-linux
@@ -549,6 +563,10 @@ CONTAINER ID   IMAGE        COMMAND                  CREATED        STATUS      
 ```
 
 `-d`로 웹 서버를 백그라운드에서 실행했다. `127.0.0.1:8080:80`은 Mac의 로컬 주소 `127.0.0.1`의 `8080` 포트를 컨테이너의 `80` 포트에 연결한다. 목록에서 `Up` 상태와 `127.0.0.1:8080->80/tcp` 매핑을 확인했다.
+
+**네트워크 네임스페이스**는 네트워크 인터페이스, IP 주소, 라우팅, 소켓 등을 나누는 Linux의 격리 단위다. 이 실습의 컨테이너는 Docker Desktop의 Linux VM 안에서 자체 네트워크 공간을 사용한다. 컨테이너의 `127.0.0.1`은 그 컨테이너를, Mac의 `127.0.0.1`은 Mac을 가리킨다. NGINX가 컨테이너 안의 `80`번 포트에서 대기하고 있어도, Mac 브라우저의 로컬 주소로 접속하려면 호스트에서 컨테이너로 전달할 경로를 연결해야 한다. [Linux 네트워크 네임스페이스](https://man7.org/linux/man-pages/man7/network_namespaces.7.html), [Docker Desktop의 네트워크 동작](https://docs.docker.com/desktop/features/networking/#how-exposed-ports-work)
+
+`-p 127.0.0.1:8080:80`을 지정하면 Docker Desktop이 Mac의 `127.0.0.1:8080`에서 받은 TCP 연결을 컨테이너의 `80`번 포트로 포워딩한다. 호스트 쪽 주소를 `127.0.0.1`로 지정해 이 실습에서는 같은 Mac에서 접속한다. 11절의 두 컨테이너는 각각 내부에서 `80`을 쓰고, Mac에서는 서로 다른 `8080`과 `8081`로 접속한다. [Docker 포트 공개와 매핑](https://docs.docker.com/engine/network/port-publishing/)
 
 ### 10.4. HTTP 응답과 서버 로그 검증
 
@@ -794,6 +812,44 @@ VERSION="24.04.5 LTS (Noble Numbat)"
 위 운영체제 출력은 앞 네 줄만 발췌했다.
 
 **처리와 재발 방지:** 이후 명령은 정상 실행됐고, `exit` 후 확인한 컨테이너 상태도 `Exited (0)`이었다. 안내문의 목록 기호와 프롬프트를 명령에 포함하지 않고, 실행할 명령어만 입력한다.
+
+### 13.4. 호스트 포트 충돌 진단 절차
+
+`docker run`에서 `address already in use` 또는 `port is already allocated`가 나오면, 먼저 `-p`에 적은 **호스트 쪽 포트**가 이미 사용 중인지 확인한다. 아래는 `8080`을 진단하는 예다.
+
+1. **포트를 점유한 소켓과 컨테이너를 확인한다.** macOS에서는 `lsof`의 `COMMAND`와 `PID`를 확인한다. `netstat`은 같은 포트의 `LISTEN` 상태를 확인하는 데 쓴다.
+
+   ```bash
+   lsof -nP -iTCP:8080 -sTCP:LISTEN
+   netstat -an -p tcp | awk '$4 ~ /[.]8080$/ && $6 == "LISTEN"'
+   docker ps --format 'table {{.Names}}\t{{.Ports}}'
+   ```
+
+   Linux 호스트에서는 `ss`로 같은 포트의 대기 소켓과 확인 가능한 프로세스 정보를 조회할 수 있다. [Linux ss 매뉴얼](https://man7.org/linux/man-pages/man8/ss.8.html)
+
+   ```bash
+   ss -ltnp 'sport = :8080'
+   ```
+
+2. **점유 주체를 확인한 뒤 포트를 해제한다.** Docker Desktop의 `com.docker.backend`가 보이면 `docker ps`의 `PORTS` 열에서 `8080->`에 해당하는 컨테이너를 찾는다. 중지해도 되는 실습 컨테이너인 경우 해당 이름을 넣어 중지한다. 예를 들어 `ws-web-8080`이 점유하고 있다면 다음과 같이 실행한다. [Docker Desktop 포트 포워딩 동작](https://docs.docker.com/desktop/features/networking/#how-exposed-ports-work)
+
+   ```bash
+   docker stop ws-web-8080
+   ```
+
+   일반 앱이면 `lsof`에서 찾은 숫자로 `PID`를 바꿔 프로세스 이름과 소유자를 확인한다. 앱의 정상 종료 기능을 먼저 사용한다. 직접 실행한 실습 프로세스가 남아 있고 종료해도 되는 것을 확인했다면 `SIGTERM`을 보낸다.
+
+   ```bash
+   ps -p PID -o pid,user,comm
+   kill -TERM PID
+   ```
+
+3. **포트를 다시 조회하고 접속을 확인한다.** 1번의 조회 명령으로 `8080`이 비었는지 확인한다. 실패한 실행에서 만든 실습 컨테이너가 `docker ps -a`에 남아 있다면 `docker start`에 그 컨테이너 이름을 넣는다. 컨테이너가 없다면 10.3절의 `docker run`을 다시 실행한다. `curl -i http://127.0.0.1:8080`으로 응답을 확인한다. 기존 서비스가 계속 필요하면, 예를 들어 사용 가능한 `8082`를 골라 새 이름으로 실행한다.
+
+   ```bash
+   docker run -d --name ws-web-8082 -p 127.0.0.1:8082:80 ws-web:1.0
+   curl -i http://127.0.0.1:8082
+   ```
 
 ## 14. Git 초기화와 GitHub 제출 준비
 

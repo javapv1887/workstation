@@ -22,8 +22,8 @@
 | 커스텀 웹 서버 이미지 | `ws-web:1.0` |
 | 실습 웹 서버 버전 | HTTP 응답의 `nginx/1.31.8` |
 | Git | 2.50.1, Apple Git-155 |
-| Git 작성자 이름 | `javapv1887` |
-| Git 작성자 이메일 | `351423688+javapv1887@users.noreply.github.com` |
+| Git 작성자 이름 | 설정 확인, 공개본에서 가림 |
+| Git 작성자 이메일 | 설정 확인, 공개본에서 가림 |
 | Git 기본 브랜치 설정 | `main` |
 
 운영체제·셸·도구 버전과 Git 설정은 문서를 정리하면서 Codex가 읽기 전용 명령으로 확인했으며, [환경 점검 로그](evidence/logs/environment-check.txt)에 보관했다. Docker 버전·엔진 동작과 `hello-world` 실행은 직접 실습했고, [Docker 기본 실습 정리 로그](evidence/logs/docker-basic-clean.txt)에 명령과 실제 출력을 기록했다.
@@ -633,7 +633,7 @@ $ docker logs ws-web-8080
 
 ### 10.5. 브라우저 화면 캡처
 
-2026년 11월 4일 사용자 요청에 따라 Codex가 Chrome에서 실제 실행 중인 웹 서버에 접속해 브라우저 창을 캡처했다.
+2026년 11월 4일 실습에서 브라우저 접속을 확인했다. 공개용 이미지는 과제와 관계없는 브라우저 탭이 화면에 나오지 않도록 실제 웹 서버에 다시 접속해 Safari 비공개 창에서 캡처했다.
 
 주소창의 `127.0.0.1:8080`과 본문의 `나의 첫 Docker 웹 서버`, `javapv1887의 컨테이너 실습입니다.` 문구가 함께 표시된다. 포트 8080으로 접속한 결과와 한글 콘텐츠의 정상 표시를 확인했다.
 
@@ -650,7 +650,7 @@ $ docker logs ws-web-8080
 | 포트 매핑 | 컨테이너 목록의 PORTS | `127.0.0.1:8080->80/tcp` |
 | HTTP 접속 | `curl -i http://127.0.0.1:8080` | `200 OK`, 소스와 동일한 HTML |
 | 서버 로그 | `docker logs ws-web-8080` | 시작 완료 및 `GET /` 응답 `200 219` |
-| 브라우저 캡처 | [실제 Chrome 화면](evidence/images/web-8080.jpg) | `127.0.0.1:8080`, 제목·본문 정상 표시 |
+| 브라우저 캡처 | [실제 브라우저 화면](evidence/images/web-8080.jpg) | `127.0.0.1:8080`, 제목·본문 정상 표시 |
 
 실습 기록은 Mac 셸에서 `exit`로 종료했고 원본 로그에 기록 종료 시각이 남아 있다.
 
@@ -717,7 +717,7 @@ Content-Length: 219
 
 ### 11.4. 브라우저 화면 캡처
 
-사용자 요청에 따라 Codex가 Chrome에서 실제 `8081` 서버에 접속해 캡처했다. 주소창의 `127.0.0.1:8081`과 바뀐 제목이 함께 보인다.
+공개용 이미지는 실제 `8081` 서버에 다시 접속해 Safari 비공개 창에서 캡처했다. 주소창의 `127.0.0.1:8081`과 바뀐 제목이 함께 보인다.
 
 ![포트 8081의 주소창과 바인드 마운트로 수정한 페이지](evidence/images/bind-mount-8081.jpg)
 
@@ -906,7 +906,7 @@ printf '%s\n' '-' | bash
 
 ### 14.1. 로컬 저장소와 첫 커밋
 
-2026년 11월 7일 사용자 요청에 따라 Codex가 과제 폴더에서 `main` 브랜치로 Git 저장소를 초기화했다. `git config --list`의 출력에서 과제에 필요한 작성자 정보와 기본 브랜치 설정을 골라 기록했다.
+2026년 11월 7일 사용자 요청에 따라 Codex가 과제 폴더에서 `main` 브랜치로 Git 저장소를 초기화했다. `git config --list`에서 작성자와 기본 브랜치가 설정되어 있음을 확인했다. 공개본에서는 작성자 이름과 이메일의 값을 가렸다.
 
 ```text
 $ git init -b main
@@ -915,8 +915,8 @@ $ git branch --show-current
 main
 $ git config --list | grep -Ei '^(user\.(name|email)|init\.defaultbranch)='
 init.defaultbranch=main
-user.name=javapv1887
-user.email=351423688+javapv1887@users.noreply.github.com
+user.name=<가림>
+user.email=<가림>
 ```
 
 [.gitignore](.gitignore)에 macOS의 `.DS_Store`와 터미널 원본 로그를 제외하는 규칙을 넣었다. README에서 링크한 증거 로그와 화면 캡처는 첫 커밋에 포함했다.
@@ -933,7 +933,7 @@ git status
 
 사용자 요청에 따라 Codex가 GitHub CLI로 공개 저장소를 만들고 첫 커밋 `c9d5756`을 올렸다. 로컬 `main`이 `origin/main`을 추적한다.
 
-GitHub에서 푸시된 커밋과 그 커밋에 포함된 파일을 확인할 수 있다. [첫 커밋 c9d5756](https://github.com/javapv1887/workstation/commit/c9d575623525f50148921530461040d2cc94ec0d)
+GitHub에서 푸시된 커밋을 확인할 수 있다. [main 브랜치 커밋 목록](https://github.com/javapv1887/workstation/commits/main/)
 
 ```text
 $ gh repo create javapv1887/workstation --public --source=. --remote=origin --push

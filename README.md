@@ -131,6 +131,8 @@ empty.txt       note.txt
 
 ### 4.5. 검증 방법과 결과 위치
 
+실습 로그에서 [파일 생성 후 전체 목록](evidence/logs/terminal-practice.txt#L30-L37)과 [이름 변경 및 삭제 직후 목록](evidence/logs/terminal-practice.txt#L51-L56)을 바로 확인할 수 있다.
+
 | 수행 항목 | 검증 방법 | 확인된 결과 | 증거 |
 | --- | --- | --- | --- |
 | 현재 위치·이동 | `cd` 후 `pwd` | 과제 폴더와 하위 실습 폴더 경로 확인 | [4.1](#41-작업-폴더-생성과-현재-위치-확인), [전체 로그](evidence/logs/terminal-practice.txt) |
@@ -178,6 +180,8 @@ drwx------  2 <USER>  staff  64 Nov  3 20:56 permission-test
 
 `600`은 소유자에게만 파일 읽기·쓰기 권한을 준다. `700`은 소유자에게만 디렉터리 목록 확인·내용 변경·진입 권한을 준다. 이 단계에서 그룹과 다른 사용자의 기본 접근 권한이 제거된 것을 권한 표기로 확인했다.
 
+개인 파일과 작업 디렉터리를 소유자만 사용할 수 있게 하는 설정을 비교하려고 이 값을 선택했다. 팀이 함께 쓰는 파일에 적용하면 다른 사용자가 읽지 못하고, 디렉터리에 적용하면 그 안의 파일에도 접근하지 못할 수 있다.
+
 ### 5.3. 기존 권한으로 복원
 
 ```text
@@ -198,6 +202,8 @@ drwxr-xr-x  2 <USER>  staff  64 Nov  3 20:56 permission-test
 | 디렉터리 `permission-test` | `755` / `rwxr-xr-x` | `700` / `rwx------` | `755` / `rwxr-xr-x` | `755` |
 
 권한 숫자는 소유자·그룹·다른 사용자 순서이며, 읽기 `r=4`, 쓰기 `w=2`, 실행 `x=1`을 더해서 표시한다. 따라서 `6=4+2`는 읽기·쓰기, `7=4+2+1`은 읽기·쓰기·실행이고 `0`은 권한 없음이다. 디렉터리에서 `x`는 해당 디렉터리를 통과하거나 진입하는 권한이다.
+
+macOS의 `ls -l`에서 권한 문자열 뒤의 `@`는 확장 속성이 있다는 뜻이다. `ls -l@ note.txt`로 속성의 이름과 크기를 확인할 수 있다.
 
 로그의 세 차례 `ls -ld` 출력과 검사 당시 실제 파일 상태가 일치하므로, 파일 1개와 디렉터리 1개의 권한 변경 전후 비교를 완료했다.
 
@@ -233,6 +239,14 @@ Server:
 
 호스트 운영체제는 macOS이고, 서버의 `OSType: linux`는 Docker Desktop이 제공하는 Linux 컨테이너 실행 환경을 나타낸다.
 
+문서 보완 과정에서 Mac의 Docker Desktop 상태를 추가로 확인했다. 아래는 상태 행을 발췌한 것이다. `docker desktop status`로 Desktop의 상태를 조회하고, `docker info`의 `Server` 정보로 CLI가 엔진과 통신하는지 확인한다. [Docker Desktop 상태 명령](https://docs.docker.com/reference/cli/docker/desktop/status/)
+
+```text
+$ docker desktop status
+Name                Value
+Status              running
+```
+
 ### 6.2. hello-world 실행
 
 ```text
@@ -255,6 +269,16 @@ CONTAINER ID   IMAGE         COMMAND    CREATED                  STATUS         
 ```
 
 `hello-world:latest` 이미지가 저장돼 있고, 컨테이너 `14a81c87714f` (`compassionate_merkle`)가 `Exited (0)`으로 종료된 것을 확인했다. 종료 코드 `0`은 프로그램이 정상 종료됐다는 뜻이다. 이미지와 종료된 컨테이너가 각각 목록에 남아 있는 것도 확인했다.
+
+`hello-world` 실행과 그 컨테이너 상태는 같은 기록에 남아 있다. [실행부터 컨테이너 목록까지](evidence/logs/docker-basic-clean.txt#L118-L146)
+
+이미지가 여러 개라면 `--filter`로 태그를 고르고 `--format`으로 필요한 열을 지정할 수 있다. 문서 보완 과정에서 아래 조회로 같은 이미지 ID를 확인했다. [Docker 이미지 목록 옵션](https://docs.docker.com/reference/cli/docker/image/ls/)
+
+```text
+$ docker image ls --filter 'reference=hello-world:latest' --format 'table {{.Repository}}\t{{.Tag}}\t{{.ID}}'
+REPOSITORY    TAG       IMAGE ID
+hello-world   latest    c567b231f656
+```
 
 ### 6.4. 검증 결과와 남은 운영 실습
 
@@ -552,6 +576,8 @@ $ docker build -t ws-web:1.0 .
 
 빌드는 `7/7 FINISHED`로 완료됐고 이미지 이름이 `ws-web:1.0`으로 등록됐다. 위 출력은 핵심 단계만 발췌했으며 전체 최종 프레임은 정리 로그에서 확인할 수 있다. 빌드 로그의 digest 일부는 당시 터미널 폭 때문에 축약 표시돼 있다.
 
+빌드 문제를 조사하면서 기존 빌드 캐시를 건너뛰려면 저장소 루트에서 `docker build --no-cache -t ws-web:cache-check .`를 실행할 수 있다. 베이스 이미지의 새 버전도 확인하려면 `--pull`을 함께 지정한다. [Docker 빌드 캐시와 베이스 이미지 옵션](https://docs.docker.com/build/building/best-practices/)
+
 ### 10.3. 컨테이너 실행과 포트 매핑
 
 ```text
@@ -738,6 +764,15 @@ $ docker run --name ws-volume-reader \
 volume data survives
 ```
 
+문서 보완 과정에서 기존 볼륨을 읽기 전용으로 연결하고 `ls -ln`으로 파일 권한, 소유자 UID, 그룹 GID를 확인했다. `note.txt`는 `644`이고 UID와 GID는 모두 `0`이었다.
+
+```text
+$ docker run --rm --pull never --mount type=volume,source=ws-volume-data,target=/data,readonly ubuntu:24.04 ls -ln /data/note.txt
+-rw-r--r-- 1 0 0 21 Nov  6 12:25 /data/note.txt
+```
+
+호스트에서 편집한 소스나 설정을 컨테이너에서 바로 읽게 하려면 11절의 바인드 마운트가 적합하다. 컨테이너를 교체해도 유지할 데이터베이스 파일처럼 Docker가 관리할 데이터에는 이름이 있는 볼륨이 적합하다. [Docker 볼륨 사용처](https://docs.docker.com/engine/storage/volumes/#when-to-use-volumes)
+
 ## 13. 트러블슈팅
 
 ### 13.1. 존재하지 않는 경로로 이동 시도
@@ -760,6 +795,14 @@ $ mkdir -p "<PROJECT_ROOT>"
 $ cd "<PROJECT_ROOT>"
 $ pwd
 <PROJECT_ROOT>
+```
+
+같은 오류를 재현하려면 임시 폴더를 만들고 그 안의 존재하지 않는 경로로 이동해 본다.
+
+```bash
+repro_dir=$(mktemp -d)
+(cd "$repro_dir/missing")
+rmdir "$repro_dir"
 ```
 
 ### 13.2. 명령어와 옵션 사이의 공백 누락
@@ -813,6 +856,12 @@ VERSION="24.04.5 LTS (Noble Numbat)"
 
 **처리와 재발 방지:** 이후 명령은 정상 실행됐고, `exit` 후 확인한 컨테이너 상태도 `Exited (0)`이었다. 안내문의 목록 기호와 프롬프트를 명령에 포함하지 않고, 실행할 명령어만 입력한다.
 
+단독 하이픈 오류는 Mac 터미널에서 Bash에 `-` 한 줄을 전달해 재현할 수 있다.
+
+```bash
+printf '%s\n' '-' | bash
+```
+
 ### 13.4. 호스트 포트 충돌 진단 절차
 
 `docker run`에서 `address already in use` 또는 `port is already allocated`가 나오면, 먼저 `-p`에 적은 **호스트 쪽 포트**가 이미 사용 중인지 확인한다. 아래는 `8080`을 진단하는 예다.
@@ -851,6 +900,8 @@ VERSION="24.04.5 LTS (Noble Numbat)"
    curl -i http://127.0.0.1:8082
    ```
 
+컨테이너 이름이 이미 사용 중이라는 오류는 `docker ps -a --filter 'name=^/ws-web-8080$'`로 확인한다. 기존 컨테이너를 보관하려면 새 컨테이너에 다른 이름을 지정하고, 뒤이은 `docker logs`나 `docker stop`에도 그 이름을 사용한다.
+
 ## 14. Git 초기화와 GitHub 제출 준비
 
 ### 14.1. 로컬 저장소와 첫 커밋
@@ -881,6 +932,8 @@ git status
 ### 14.2. GitHub 원격 저장소 연결과 업로드
 
 사용자 요청에 따라 Codex가 GitHub CLI로 공개 저장소를 만들고 첫 커밋 `c9d5756`을 올렸다. 로컬 `main`이 `origin/main`을 추적한다.
+
+GitHub에서 푸시된 커밋과 그 커밋에 포함된 파일을 확인할 수 있다. [첫 커밋 c9d5756](https://github.com/javapv1887/workstation/commit/c9d575623525f50148921530461040d2cc94ec0d)
 
 ```text
 $ gh repo create javapv1887/workstation --public --source=. --remote=origin --push
